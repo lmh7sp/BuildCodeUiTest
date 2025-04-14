@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="bcdemo01Srv" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotation Term="Core.Links">
+                <Collection>
+                    <Record>
+                        <PropertyValue Property="rel" String="author"/>
+                        <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+                    </Record>
+                </Collection>
+            </Annotation>
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="PurchaseReq" EntityType="bcdemo01Srv.PurchaseReq">
+                    <NavigationPropertyBinding Path="items" Target="PurchaseReqItem"/>
+                </EntitySet>
+                <EntitySet Name="PurchaseReqItem" EntityType="bcdemo01Srv.PurchaseReqItem">
+                    <NavigationPropertyBinding Path="purchaseReq" Target="PurchaseReq"/>
+                    <NavigationPropertyBinding Path="inventory" Target="Inventory"/>
+                </EntitySet>
+                <EntitySet Name="Inventory" EntityType="bcdemo01Srv.Inventory">
+                    <NavigationPropertyBinding Path="product" Target="Product"/>
+                    <NavigationPropertyBinding Path="purchaseReqItem" Target="PurchaseReqItem"/>
+                </EntitySet>
+                <EntitySet Name="Product" EntityType="bcdemo01Srv.Product">
+                    <NavigationPropertyBinding Path="inventory" Target="Inventory"/>
+                </EntitySet>
+                <EntitySet Name="Employee" EntityType="bcdemo01Srv.Employee">
+                    <NavigationPropertyBinding Path="supervisor" Target="Employee"/>
+                </EntitySet>
+            </EntityContainer>
+            <EntityType Name="PurchaseReq">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="requester" Type="Edm.String" MaxLength="100"/>
+                <Property Name="reqDate" Type="Edm.Date"/>
+                <Property Name="approveYN" Type="Edm.Boolean"/>
+                <Property Name="comment" Type="Edm.String" MaxLength="500"/>
+                <NavigationProperty Name="items" Type="Collection(bcdemo01Srv.PurchaseReqItem)" Partner="purchaseReq">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="PurchaseReqItem">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="itemID" Type="Edm.String" MaxLength="50"/>
+                <Property Name="materialID" Type="Edm.String" MaxLength="50"/>
+                <Property Name="reqQuantity" Type="Edm.Int32"/>
+                <Property Name="unitOfMeasure" Type="Edm.String" MaxLength="10"/>
+                <NavigationProperty Name="purchaseReq" Type="bcdemo01Srv.PurchaseReq" Partner="items">
+                    <ReferentialConstraint Property="purchaseReq_ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="purchaseReq_ID" Type="Edm.Guid"/>
+                <NavigationProperty Name="inventory" Type="bcdemo01Srv.Inventory" Partner="purchaseReqItem">
+                    <ReferentialConstraint Property="inventory_ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="inventory_ID" Type="Edm.Guid"/>
+            </EntityType>
+            <EntityType Name="Inventory">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="materialID" Type="Edm.String" MaxLength="50"/>
+                <Property Name="plant" Type="Edm.String" MaxLength="50"/>
+                <Property Name="availableQuantity" Type="Edm.Int32"/>
+                <Property Name="unitOfMeasure" Type="Edm.String" MaxLength="10"/>
+                <NavigationProperty Name="product" Type="bcdemo01Srv.Product" Partner="inventory">
+                    <ReferentialConstraint Property="product_ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="product_ID" Type="Edm.Guid"/>
+                <NavigationProperty Name="purchaseReqItem" Type="Collection(bcdemo01Srv.PurchaseReqItem)" Partner="inventory"/>
+            </EntityType>
+            <EntityType Name="Product">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="materialID" Type="Edm.String" MaxLength="50"/>
+                <Property Name="materialName" Type="Edm.String" MaxLength="100"/>
+                <Property Name="model" Type="Edm.String" MaxLength="50"/>
+                <Property Name="unitOfMeasure" Type="Edm.String" MaxLength="10"/>
+                <Property Name="supplierName" Type="Edm.String" MaxLength="100"/>
+                <NavigationProperty Name="inventory" Type="Collection(bcdemo01Srv.Inventory)" Partner="product"/>
+            </EntityType>
+            <EntityType Name="Employee">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="empName" Type="Edm.String" MaxLength="100"/>
+                <Property Name="phoneNo" Type="Edm.String" MaxLength="15"/>
+                <Property Name="deptNo" Type="Edm.String" MaxLength="10"/>
+                <Property Name="deptName" Type="Edm.String" MaxLength="100"/>
+                <NavigationProperty Name="supervisor" Type="bcdemo01Srv.Employee">
+                    <ReferentialConstraint Property="supervisor_ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="supervisor_ID" Type="Edm.Guid"/>
+            </EntityType>
+            <Annotations Target="bcdemo01Srv.PurchaseReq">
+                <Annotation Term="UI.HeaderInfo">
+                    <Record Type="UI.HeaderInfoType">
+                        <PropertyValue Property="TypeName" String="Purchase Request"/>
+                        <PropertyValue Property="TypeNamePlural" String="Purchase Requests"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="requester"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="reqDate"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="approveYN"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="comment"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="Main">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="requester"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="reqDate"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="approveYN"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="comment"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="createdAt"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="createdBy"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="modifiedAt"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="modifiedBy"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="Main"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Main"/>
+                        </Record>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="PurchaseReqItem"/>
+                            <PropertyValue Property="Target" AnnotationPath="items/@UI.LineItem"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created At"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Modified At"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Modified By"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/requester">
+                <Annotation Term="Common.Label" String="Requester"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/reqDate">
+                <Annotation Term="Common.Label" String="Request Date"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/approveYN">
+                <Annotation Term="Common.Label" String="Approved?"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/comment">
+                <Annotation Term="Common.Label" String="Comment"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReq/items">
+                <Annotation Term="Common.Label" String="Items"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem">
+                <Annotation Term="UI.HeaderInfo">
+                    <Record Type="UI.HeaderInfoType">
+                        <PropertyValue Property="TypeName" String="Purchase Request Item"/>
+                        <PropertyValue Property="TypeNamePlural" String="Purchase Request Items"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Value" Path="itemID"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="itemID"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="itemID"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="reqQuantity"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="unitOfMeasure"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="Inventory"/>
+                            <PropertyValue Property="Value" Path="inventory_ID"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="Main">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="itemID"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="reqQuantity"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="unitOfMeasure"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Inventory"/>
+                                    <PropertyValue Property="Value" Path="inventory_ID"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="Main"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Main"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>purchaseReq_ID</PropertyPath>
+                        <PropertyPath>inventory_ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/ID">
+                <Annotation Term="UI.Hidden" Bool="true"/>
+                <Annotation Term="Common.Text" Path="itemID">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/itemID">
+                <Annotation Term="Common.Label" String="Item ID"/>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/reqQuantity">
+                <Annotation Term="Common.Label" String="Requested Quantity"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/unitOfMeasure">
+                <Annotation Term="Common.Label" String="Unit of Measure"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/purchaseReq">
+                <Annotation Term="Common.Label" String="Purchase Request"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/purchaseReq_ID">
+                <Annotation Term="Common.ValueList">
+                    <Record Type="Common.ValueListType">
+                        <PropertyValue Property="CollectionPath" String="PurchaseReq"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="purchaseReq_ID"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="requester"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="reqDate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="approveYN"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="comment"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="createdAt"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="createdBy"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="modifiedAt"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="modifiedBy"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.Label" String="Purchase Request"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/inventory">
+                <Annotation Term="Common.Label" String="Inventory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.PurchaseReqItem/inventory_ID">
+                <Annotation Term="Common.ValueList">
+                    <Record Type="Common.ValueListType">
+                        <PropertyValue Property="CollectionPath" String="Inventory"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="inventory_ID"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="materialID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="plant"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="availableQuantity"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="unitOfMeasure"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.Text" Path="inventory/materialID">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Common.Label" String="Inventory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory">
+                <Annotation Term="UI.HeaderInfo">
+                    <Record Type="UI.HeaderInfoType">
+                        <PropertyValue Property="TypeName" String="Inventory"/>
+                        <PropertyValue Property="TypeNamePlural" String="Inventories"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Value" Path="materialID"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="materialID"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="materialID"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="plant"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="availableQuantity"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="unitOfMeasure"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="Product"/>
+                            <PropertyValue Property="Value" Path="product_ID"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="Main">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="materialID"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="plant"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="availableQuantity"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="unitOfMeasure"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Product"/>
+                                    <PropertyValue Property="Value" Path="product_ID"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="Main"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Main"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>product_ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/ID">
+                <Annotation Term="UI.Hidden" Bool="true"/>
+                <Annotation Term="Common.Text" Path="materialID">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/materialID">
+                <Annotation Term="Common.Label" String="Material ID"/>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/plant">
+                <Annotation Term="Common.Label" String="Plant"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/availableQuantity">
+                <Annotation Term="Common.Label" String="Available Quantity"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/unitOfMeasure">
+                <Annotation Term="Common.Label" String="Unit of Measure"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/product">
+                <Annotation Term="Common.Label" String="Product"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/product_ID">
+                <Annotation Term="Common.ValueList">
+                    <Record Type="Common.ValueListType">
+                        <PropertyValue Property="CollectionPath" String="Product"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="product_ID"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="materialID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="materialName"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="model"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="unitOfMeasure"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="supplierName"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.Text" Path="product/materialID">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Common.Label" String="Product"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Inventory/purchaseReqItem">
+                <Annotation Term="Common.Label" String="Purchase Request Items"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product">
+                <Annotation Term="UI.HeaderInfo">
+                    <Record Type="UI.HeaderInfoType">
+                        <PropertyValue Property="TypeName" String="Product"/>
+                        <PropertyValue Property="TypeNamePlural" String="Products"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Value" Path="materialID"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="materialID"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="materialID"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="materialName"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="model"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="unitOfMeasure"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="supplierName"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="Main">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="materialID"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="materialName"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="model"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="unitOfMeasure"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="supplierName"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="Main"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Main"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>materialID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/ID">
+                <Annotation Term="UI.Hidden" Bool="true"/>
+                <Annotation Term="Common.Text" Path="materialID">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/materialID">
+                <Annotation Term="Common.Label" String="Material ID"/>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/materialName">
+                <Annotation Term="Common.Label" String="Material Name"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/model">
+                <Annotation Term="Common.Label" String="Model"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/unitOfMeasure">
+                <Annotation Term="Common.Label" String="Unit of Measure"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/supplierName">
+                <Annotation Term="Common.Label" String="Supplier Name"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Product/inventory">
+                <Annotation Term="Common.Label" String="Inventory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee">
+                <Annotation Term="UI.HeaderInfo">
+                    <Record Type="UI.HeaderInfoType">
+                        <PropertyValue Property="TypeName" String="Employee"/>
+                        <PropertyValue Property="TypeNamePlural" String="Employees"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Value" Path="empName"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="empName"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="empName"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="phoneNo"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="deptNo"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="deptName"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="Supervisor"/>
+                            <PropertyValue Property="Value" Path="supervisor_ID"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="Main">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="empName"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="phoneNo"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="deptNo"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="deptName"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Supervisor"/>
+                                    <PropertyValue Property="Value" Path="supervisor_ID"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="Main"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Main"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>supervisor_ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/ID">
+                <Annotation Term="UI.Hidden" Bool="true"/>
+                <Annotation Term="Common.Text" Path="empName">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/empName">
+                <Annotation Term="Common.Label" String="Employee Name"/>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/phoneNo">
+                <Annotation Term="Common.Label" String="Phone Number"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/deptNo">
+                <Annotation Term="Common.Label" String="Department Number"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/deptName">
+                <Annotation Term="Common.Label" String="Department Name"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/supervisor">
+                <Annotation Term="Common.Label" String="Supervisor"/>
+            </Annotations>
+            <Annotations Target="bcdemo01Srv.Employee/supervisor_ID">
+                <Annotation Term="Common.ValueList">
+                    <Record Type="Common.ValueListType">
+                        <PropertyValue Property="CollectionPath" String="Employee"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="supervisor_ID"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="empName"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="phoneNo"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="deptNo"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="deptName"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.Text" Path="supervisor/empName">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="Common.Label" String="Supervisor"/>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

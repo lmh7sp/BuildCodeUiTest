@@ -1,0 +1,69 @@
+<mvc:View controllerName="bcui04.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:filterbar="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+    <Page id="page" title="{i18n>title}">
+        <content>
+            <filterbar:FilterBar id="filterBar" search="onSearch">
+                <filterbar:filterItems>
+                    <filterbar:FilterItem name="requester" label="{i18n>requester}">
+                        <filterbar:control>
+                            <Input id="requesterInput" value="{requester}" />
+                        </filterbar:control>
+                    </filterbar:FilterItem>
+                    <filterbar:FilterItem name="reqDate" label="{i18n>requestDate}">
+                        <filterbar:control>
+                            <DatePicker id="reqDatePicker" value="{reqDate}" />
+                        </filterbar:control>
+                    </filterbar:FilterItem>
+                    <filterbar:FilterItem name="approveYN" label="{i18n>approved}">
+                        <filterbar:control>
+                            <Select id="approveYNSelect" selectedKey="{approveYN}" forceSelection="false">
+                                <items>
+                                    <core:Item key="" text="{i18n>all}" />
+                                    <core:Item key="true" text="{i18n>yes}" />
+                                    <core:Item key="false" text="{i18n>no}" />
+                                </items>
+                            </Select>
+                        </filterbar:control>
+                    </filterbar:FilterItem>
+                </filterbar:filterItems>
+            </filterbar:FilterBar>
+            <Table id="purchaseReqTable" items="{/PurchaseReq}" mode="MultiSelect">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title id="tableTitle" text="Purchase Req (0)" level="H2" />
+                        <ToolbarSpacer />
+                        <Button text="{i18n>new}" press="onNewPress" />
+                        <Button text="{i18n>remove}" press="onRemovePress" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>requester}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>requestDate}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>comment}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>approved}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press="onItemPress">
+                        <cells>
+                            <Text text="{requester}" />
+                            <Text text="{reqDate}" />
+                            <Text text="{comment}" />
+                            <Text text="{approveYN}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

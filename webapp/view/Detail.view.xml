@@ -1,0 +1,79 @@
+<mvc:View controllerName="bcui04.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form">
+    <Page id="detailPage" title="{i18n>detailTitle}">
+        <content>
+            <VBox>
+                <!-- Display Mode Form -->
+                <form:SimpleForm layout="ResponsiveGridLayout" visible="{= !${edit>/editMode}}">
+                    <Label text="{i18n>requester}" />
+                    <Text text="{requester}" />
+
+                    <Label text="{i18n>requestDate}" />
+                    <Text text="{reqDate}" />
+
+                    <Label text="{i18n>approved}" />
+                    <Text text="{approveYN}" />
+
+                    <Label text="{i18n>comment}" />
+                    <Text text="{comment}" />
+                </form:SimpleForm>
+
+                <!-- Edit Mode Form -->
+                <form:SimpleForm layout="ResponsiveGridLayout" visible="{edit>/editMode}">
+                    <Label text="{i18n>requester}" />
+                    <Input id="requesterInput" value="{requester}" required="true" />
+
+                    <Label text="{i18n>requestDate}" />
+                    <DatePicker id="reqDatePicker" value="{reqDate}" required="true" />
+
+                    <Label text="{i18n>approved}" />
+                    <CheckBox selected="{approveYN}" text="{i18n>approved}" />
+
+                    <Label text="{i18n>comment}" />
+                    <TextArea value="{comment}" />
+                </form:SimpleForm>
+
+                <Table id="purchaseReqItemTable" items="{path: 'items'}" mode="{= ${edit>/editMode} ? 'MultiSelect' : 'None'}">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>purchaseReqItems}" level="H2" />
+                            <ToolbarSpacer />
+                            <Button text="{i18n>addItem}" press="onAddItemPress" visible="{edit>/editMode}" />
+                            <Button text="{i18n>removeItem}" press="onRemoveItemPress" visible="{edit>/editMode}" />
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>itemID}" />
+                        </Column>
+                        <Column>
+                            <Text text="{i18n>reqQuantity}" />
+                        </Column>
+                        <Column>
+                            <Text text="{i18n>unitOfMeasure}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Input value="{itemID}" editable="{edit>/editMode}" />
+                                <Input value="{reqQuantity}" editable="{edit>/editMode}" />
+                                <Input value="{unitOfMeasure}" editable="{edit>/editMode}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>edit}" press="onEditPress" visible="{= !${edit>/editMode}}" />
+                <Button text="{i18n>save}" press="onSavePress" visible="{edit>/editMode}" />
+                <Button text="{i18n>cancel}" press="onCancelPress" visible="{edit>/editMode}" />
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>
